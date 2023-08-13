@@ -1,0 +1,50 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query @guard {
+    recipes: [Recipe!]! @all
+
+    recipe(id: Int! @eq): Recipe @find
+}
+
+type Mutation {
+    createRecipe(
+        title: String!
+        ingredients: String!
+        method: String!
+        userId: Int!
+    ): Recipe @create
+
+    upsertRecipe(
+        id: ID!
+        title: String!
+        ingredients: String!
+        method: String!
+        userId: Int!
+    ): Recipe @upsert @inject(context: "user.id", name: "userId")
+
+    "Log in to a new session and get the user."
+    login(email: String!, password: String!): User!
+
+    "Log out from the current session, showing the user one last time."
+    logout: User @guard
+}
+
+"Account of a person who utilizes this application."
+type Recipe {
+    "Unique primary key."
+    id: ID!
+
+    "Non-unique name."
+    title: String!
+    ingredients: String!
+    method: String!
+    userId: Int!
+}
+
+type User {
+    id: ID!
+    email: String!
+}

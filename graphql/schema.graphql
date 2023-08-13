@@ -1,0 +1,59 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    recipes: [Recipe!]! @all @whereAuth(relation: "user") @guard
+
+    recipe(id: Int! @eq): Recipe @find
+
+    me: User @auth
+}
+
+type Mutation {
+    "Log in to a new session and get the user."
+    login(email: String!, password: String!): ApiToken!
+
+    "Log out from the current session, showing the user one last time."
+    logout: User @guard
+
+    register(input: RegisterInput!): User!
+
+    createRecipe(title: String!, ingredients: String!, method: String!): Recipe
+        @create
+        @inject(context: "user.id", name: "userId")
+        @guard
+
+    updateRecipe(
+        id: ID!
+        title: String
+        ingredients: String
+        method: String
+    ): Recipe @update @guard
+
+    deleteRecipe(id: ID! @eq): Recipe @delete @guard
+}
+
+type Recipe {
+    id: ID!
+    title: String!
+    ingredients: String!
+    method: String!
+    userId: Int!
+}
+
+type User {
+    id: ID!
+    email: String
+}
+
+type ApiToken {
+    token: String
+}
+
+input RegisterInput {
+    email: String! @rules(apply: ["bail", "email", "unique:users,email"])
+    password: String! @rules(apply: ["confirmed"])
+    password_confirmation: String!
+}

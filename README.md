@@ -1,2 +1,2 @@
-# articleLMprogressiveWebAppGraphQLApi
-article LM sur PWA, partie graphQL
+## API pour l'application PWA
+
